@@ -12,7 +12,7 @@ function DocsLayout() {
 
   // Set initial sidebar state based on screen size
   useEffect(() => {
-    const handleResize = (): void => {
+    const handleResize = () => {
       // Open sidebar by default on large screens (>= 1024px)
       setSidebarOpen(window.innerWidth >= 1024);
     };
