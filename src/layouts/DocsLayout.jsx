@@ -1,8 +1,24 @@
 import { Link, Outlet } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function DocsLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Default sidebar state based on screen size
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Set initial sidebar state based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      // Open sidebar by default on large screens (>= 1024px)
+      setSidebarOpen(window.innerWidth >= 1024);
+    };
+    
+    // Set initial state
+    handleResize();
+    
+    // Listen for resize events
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const navigation = [
     { name: 'Getting Started', href: '/docs' },

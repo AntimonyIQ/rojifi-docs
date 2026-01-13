@@ -1,16 +1,69 @@
-# React + Vite
+# Rojifi REST API Documentation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Official documentation website for the Rojifi REST API built with React, Vite, and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🚀 Fast development with Vite
+- ⚛️ React 19 with React Router for routing
+- 🎨 Tailwind CSS for styling
+- 📱 Fully responsive design
+- 📚 Comprehensive API documentation
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js 18+ 
+- npm or yarn
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+### Development
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+The site will be available at `http://localhost:5173`
+
+### Build
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+## Project Structure
+
+- `/` - Homepage introducing the Rojifi REST API
+- `/docs` - Documentation with sidebar layout
+- `/docs/authentication` - Authentication guide
+- `/docs/endpoints` - API endpoints reference
+- `/docs/errors` - Error handling documentation
+- `/docs/rate-limits` - Rate limits information
+- `/docs/examples` - Code examples
+
+## Technologies
+
+- **Vite** - Build tool and dev server
+- **React** - UI framework
+- **React Router** - Client-side routing
+- **Tailwind CSS** - Utility-first CSS framework
+- **ESLint** - Code linting
