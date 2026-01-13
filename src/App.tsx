@@ -1,12 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
-import Homepage from './pages/Homepage';
-import DocsLayout from './layouts/DocsLayout';
-import GettingStarted from './pages/GettingStarted';
-import Authentication from './pages/Authentication';
-import Endpoints from './pages/Endpoints';
-import Errors from './pages/Errors';
-import RateLimits from './pages/RateLimits';
-import Examples from './pages/Examples';
+import Homepage from './pages/Homepage.tsx';
+import DocsLayout from './layouts/DocsLayout.tsx';
+import GettingStarted from './pages/GettingStarted.tsx';
+import Authentication from './pages/Authentication.tsx';
+import Endpoints from './pages/Endpoints.tsx';
+import Errors from './pages/Errors.tsx';
+import RateLimits from './pages/RateLimits.tsx';
+import Examples from './pages/Examples.tsx';
 
 function App() {
   return (

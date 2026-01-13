@@ -1,13 +1,18 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+interface NavigationItem {
+  name: string;
+  href: string;
+}
+
 function DocsLayout() {
   // Default sidebar state based on screen size
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   // Set initial sidebar state based on screen size
   useEffect(() => {
-    const handleResize = () => {
+    const handleResize = (): void => {
       // Open sidebar by default on large screens (>= 1024px)
       setSidebarOpen(window.innerWidth >= 1024);
     };
@@ -20,7 +25,7 @@ function DocsLayout() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const navigation = [
+  const navigation: NavigationItem[] = [
     { name: 'Getting Started', href: '/docs' },
     { name: 'Authentication', href: '/docs/authentication' },
     { name: 'Endpoints', href: '/docs/endpoints' },
