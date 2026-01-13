@@ -1,6 +1,6 @@
 # Rojifi REST API Documentation
 
-Official documentation website for the Rojifi REST API built with React, Vite, and Tailwind CSS.
+Official documentation website for the Rojifi REST API built with React, TypeScript, Vite, and Tailwind CSS.
 
 ## Features
 
@@ -9,6 +9,7 @@ Official documentation website for the Rojifi REST API built with React, Vite, a
 - 🎨 Tailwind CSS for styling
 - 📱 Fully responsive design
 - 📚 Comprehensive API documentation
+- 🔷 Built with TypeScript for type safety
 
 ## Getting Started
 
@@ -64,6 +65,7 @@ npm run preview
 
 - **Vite** - Build tool and dev server
 - **React** - UI framework
+- **TypeScript** - Type-safe JavaScript
 - **React Router** - Client-side routing
 - **Tailwind CSS** - Utility-first CSS framework
 - **ESLint** - Code linting
