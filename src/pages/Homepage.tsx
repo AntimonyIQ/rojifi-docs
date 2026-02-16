@@ -586,17 +586,11 @@ const TerminalAnimation = () => {
 
             await new Promise(r => setTimeout(r, 600));
             if (!isMounted) return;
+            // ACTUAL FIX: Use installLines here instead of manually constructing the final state again
             setLines(prev => {
                 const newLines = [...prev];
                 newLines.pop(); // remove spinner
-                return [...newLines,
-                <div key="added" className="text-green-400 text-xs mt-1 font-mono">
-                    <span className="text-slate-500">+</span> rojifi@2.0.0
-                </div>,
-                <div key="stats" className="text-slate-400 text-xs">added 1 package in 1.4s</div>,
-                <div key="done" className="text-green-500 text-xs font-bold mt-2">Done</div>,
-                <div key="prompt-final" className="mt-2 text-slate-400 text-xs">$ <span className="animate-pulse inline-block w-1.5 h-3 bg-slate-500 ml-1 align-middle"></span></div>
-                ];
+                return [currentCmd, ...installLines];
             });
 
             // Loop
