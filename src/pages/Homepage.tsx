@@ -434,12 +434,12 @@ const StatusCarousel = () => {
                         ) : (
                             /* Service Status Card Design */
                             <div className="flex flex-col gap-3">
-                                <div className="flex items-center justify-between">
-                                    <h4 className="font-semibold text-slate-900 dark:text-slate-200 text-lg flex items-center gap-2">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <h4 className="font-semibold text-slate-900 dark:text-slate-200 text-base md:text-lg flex items-center gap-2 truncate min-w-0">
                                         {/* Simple icon based on name length just to vary it slightly if we wanted, or generic server icon */}
                                         {service.name}
                                     </h4>
-                                    <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-1 rounded-full border border-emerald-100 dark:border-emerald-900/50">
+                                        <span className="flex-shrink-0 flex items-center gap-1.5 text-[10px] md:text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-1 rounded-full border border-emerald-100 dark:border-emerald-900/50">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                         Operational
                                     </span>
@@ -451,11 +451,11 @@ const StatusCarousel = () => {
                                         <span>90 days ago</span>
                                         <span className="text-slate-500 dark:text-slate-300">Today</span>
                                     </div>
-                                    <div className="flex items-center justify-between gap-[2px] h-6 mt-1">
+                                        <div className="flex items-center justify-between gap-[2px] h-6 mt-1 overflow-hidden">
                                         {getBars(service.name).map((colorClass, idx) => (
                                             <div
                                                 key={idx}
-                                                className={`flex-1 rounded-sm h-full ${colorClass} opacity-90 hover:opacity-100 transition-opacity`}
+                                                className={`flex-1 rounded-sm h-full ${colorClass} opacity-90 hover:opacity-100 transition-opacity min-w-[3px]`}
                                             ></div>
                                         ))}
                                     </div>
@@ -631,29 +631,30 @@ function Homepage() {
                 <D3Network />
 
                 {/* Hero Section */}
-                <div className="container mx-auto px-4 pt-32 pb-20 sm:pt-40 sm:pb-24 lg:pb-32">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div className="container mx-auto px-4 pt-32 pb-12 sm:pt-40 sm:pb-24 lg:pb-32">
+                    <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
+                            className="text-center lg:text-left"
                         >
-                            <div className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1 text-sm leading-6 text-slate-600 dark:text-slate-400 mb-8 backdrop-blur-sm">
+                            <div className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1 text-xs sm:text-sm leading-6 text-slate-600 dark:text-slate-400 mb-6 sm:mb-8 backdrop-blur-sm">
                                 <span className="flex h-2 w-2 rounded-full bg-brand-500 mr-2"></span>
                                 Introducing API  v2.0
                             </div>
-                            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 font-display">
-                                Financial infra for <br />
+                            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-4 sm:mb-6 font-display">
+                                Financial infra for <br className="hidden sm:block" />
                                 <span className="text-brand-600 dark:text-brand-400">internet scale</span>.
                             </h1>
-                            <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-400 max-w-xl">
+                            <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-slate-600 dark:text-slate-400 max-w-xl mx-auto lg:mx-0">
                                 Rojifi provides the building blocks for modern financial applications.
                                 Accept payments, manage identity, and scale your business with a developer-first API.
                             </p>
-                            <div className="mt-10 flex items-center gap-x-6">
+                            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-x-6">
                                 <Link
                                     to="/docs"
-                                    className="group relative inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-brand-600 dark:bg-brand-500 border border-transparent rounded hover:bg-brand-700 dark:hover:bg-brand-400 transition-all duration-200"
+                                    className="w-full sm:w-auto group relative inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-brand-600 dark:bg-brand-500 border border-transparent rounded hover:bg-brand-700 dark:hover:bg-brand-400 transition-all duration-200"
                                 >
                                     Start Building
                                     <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -671,7 +672,7 @@ function Homepage() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="relative"
+                            className="relative w-full mt-8 lg:mt-0"
                         >
                             <CodeWindow />
 
@@ -728,20 +729,20 @@ function Homepage() {
                                 offscreen: { y: 50, opacity: 0, scale: 0.95 },
                                 onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8 } }
                             }}
-                            className="md:col-span-4 relative rounded-3xl bg-gradient-to-br from-slate-100 to-white dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden group"
+                            className="col-span-1 md:col-span-4 relative rounded-3xl bg-gradient-to-br from-slate-100 to-white dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 overflow-hidden group flex flex-col md:block"
                         >
-                            <div className="relative z-10">
-                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 mb-6">
+                            <div className="relative z-20 w-full md:w-1/2 p-6 sm:p-8 pointer-events-none md:pointer-events-auto">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 mb-6 backdrop-blur-sm">
                                     <Globe className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Global Payments</h3>
-                                <p className="text-slate-600 dark:text-slate-400 max-w-sm">
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 shadow-sm md:shadow-none">Global Payments</h3>
+                                <p className="text-slate-700 dark:text-slate-300 md:text-slate-600 md:dark:text-slate-400 max-w-sm font-medium md:font-normal bg-white/30 dark:bg-slate-900/30 md:bg-transparent rounded-lg p-2 md:p-0 backdrop-blur-sm md:backdrop-blur-none">
                                     Accept transactions from any corner of the world. Unified currency support across 135+ countries.
                                 </p>
                             </div>
 
                             {/* Global Payments - Vertical Carousel Tunnel */}
-                            <div className="absolute top-0 right-0 w-full md:w-1/2 h-full overflow-hidden mask-image-linear-to-l pointer-events-none flex items-center justify-center">
+                            <div className="relative w-full h-[300px] md:absolute md:top-0 md:right-0 md:w-1/2 md:h-full overflow-hidden flex items-center justify-center z-10 md:mask-image-linear-to-l pointer-events-none md:pointer-events-auto mt-4 md:mt-0">
                                 {/* Gradient Overlays for Tunnel Effect */}
                                 <div className="absolute inset-0 bg-gradient-to-b from-slate-100 via-transparent to-slate-100 dark:from-slate-950 dark:via-transparent dark:to-slate-950 z-20 pointer-events-none"></div>
 
@@ -749,6 +750,9 @@ function Homepage() {
                                 <div className="h-full w-full flex items-center justify-center relative scale-90 md:scale-100">
                                     <Carousel3D />
                                 </div>
+
+                                {/* Mobile Fade Overlay */}
+                                <div className="absolute inset-0 bg-white/60 dark:bg-slate-950/60 md:hidden z-30 pointer-events-none"></div>
                             </div>
                         </motion.div>
                         {/* Card 2: Developer First (Tall) */}
@@ -760,7 +764,7 @@ function Homepage() {
                                 offscreen: { y: 50, opacity: 0, scale: 0.95 },
                                 onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.1 } }
                             }}
-                            className="md:col-span-2 relative rounded-3xl bg-slate-900 text-white p-6 overflow-hidden flex flex-col border border-slate-800"
+                            className="md:col-span-2 relative rounded-3xl bg-slate-900 text-white p-6 overflow-hidden flex flex-col border border-slate-800 min-h-[360px] md:min-h-0"
                         >
                             <div className="relative z-10 mb-4 flex-shrink-0">
                                 <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 text-white mb-4 backdrop-blur-sm border border-white/5">
@@ -798,7 +802,7 @@ function Homepage() {
                                 offscreen: { y: 50, opacity: 0, scale: 0.95 },
                                 onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.2 } }
                             }}
-                            className="md:col-span-2 relative rounded-3xl bg-slate-900 overflow-hidden group border border-slate-800"
+                            className="md:col-span-2 relative rounded-3xl bg-slate-900 overflow-hidden group border border-slate-800 min-h-[300px] md:min-h-0"
                         >
                             {/* Matrix Background */}
                             <div className="absolute inset-0 z-0">
@@ -832,8 +836,7 @@ function Homepage() {
                                 offscreen: { y: 50, opacity: 0, scale: 0.95 },
                                 onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.3 } }
                             }}
-                            className="md:col-span-4 relative rounded-3xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden group flex flex-col md:flex-row items-center justify-between"
-                            style={{ minHeight: '320px' }}
+                            className="md:col-span-4 relative rounded-3xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden group flex flex-col md:flex-row items-center justify-between min-h-[500px] md:min-h-[320px]"
                         >
                             {/* Left Content */}
                             <div className="relative z-10 w-full md:w-1/3 mb-8 md:mb-0">
@@ -854,7 +857,7 @@ function Homepage() {
                             </div>
 
                             {/* Right Visualization - The Carousel */}
-                            <div className="relative w-full md:w-2/3 h-[280px] flex items-center justify-center">
+                            <div className="relative w-full md:w-2/3 h-[320px] flex items-center justify-center">
                                 {/* Gradient Overlays for Tunnel/Fade Effect */}
                                 <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-slate-50 to-transparent dark:from-slate-950 dark:to-transparent z-20 pointer-events-none"></div>
                                 <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-50 to-transparent dark:from-slate-950 dark:to-transparent z-20 pointer-events-none"></div>
