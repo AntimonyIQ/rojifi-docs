@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 // --- Types ---
@@ -119,9 +119,9 @@ const navigation: NavigationItem[] = [
 ];
 
 const topNav = [
-  { name: "Home", href: "/" },
+  { name: "Home", href: "https://www.rojifi.com" },
   { name: "Docs", href: "/docs" },
-  { name: "API", href: "/api" },
+  { name: "API", href: "/docs/endpoints" },
   //{ name: "Support", href: "/support" },
 ];
 
@@ -170,7 +170,7 @@ function DocsLayout() {
                 </svg>
               </button>
 
-              <Link to="/" className="flex items-center gap-2">
+              <a href="https://www.rojifi.com" className="flex items-center gap-2">
                 {/* Replace with your Logo */}
                 <img
                   src="https://www.rojifi.com/logo.png"
@@ -182,7 +182,7 @@ function DocsLayout() {
                 <span className="font-bold text-xl tracking-tight text-slate-900">
                   {headerTitle}
                 </span>
-              </Link>
+              </a>
             </div>
 
             {/* Middle: Top Navigation (Desktop) */}
@@ -214,19 +214,28 @@ function DocsLayout() {
             <div className="flex items-center gap-4">
               <nav className="hidden md:flex items-center gap-8">
                 {topNav.map((item) => (
-                  <NavLink
-                    key={item.name}
-                    to={item.href}
-                    className={({ isActive }) =>
-                      `text-sm font-medium transition-colors ${
-                        isActive
-                          ? "text-[#0C4592]"
-                          : "text-gray-500 hover:text-gray-900"
-                      }`
-                    }
-                  >
-                    {item.name}
-                  </NavLink>
+                  item.href.startsWith('http') ? (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      className="text-sm font-medium transition-colors text-gray-500 hover:text-gray-900"
+                    >
+                      {item.name}
+                    </a>
+                  ) : (
+                      <NavLink
+                        key={item.name}
+                        to={item.href}
+                        className={({ isActive }) =>
+                          `text-sm font-medium transition-colors ${isActive
+                            ? "text-[#0C4592]"
+                            : "text-gray-500 hover:text-gray-900"
+                          }`
+                        }
+                      >
+                        {item.name}
+                      </NavLink>
+                    )
                 ))}
               </nav>
               <a
