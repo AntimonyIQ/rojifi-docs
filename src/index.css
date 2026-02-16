@@ -60,8 +60,10 @@
     animation-delay: 0.3s;
   }
 
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
+  /* Smooth scrolling - respects user preference for reduced motion */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 }
