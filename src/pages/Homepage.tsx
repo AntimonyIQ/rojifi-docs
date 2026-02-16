@@ -322,7 +322,7 @@ const Carousel3D = () => {
                                     {currency.code}
                                 </span>
                                 {isActive && (
-                                    <span className="text-xs font-medium text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+                                    <span className="text-xs font-medium text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-0.5 rounded-full">
                                         Active
                                     </span>
                                 )}
@@ -334,6 +334,289 @@ const Carousel3D = () => {
                     </motion.div>
                 );
             })}
+        </div>
+    );
+};
+
+// Status Carousel Component (Similar to Global Payment Carousel but for System Status)
+const StatusCarousel = () => {
+    const services = [
+        { name: 'All Systems Operational', type: 'summary', status: 'Operational' },
+        { name: 'AI Gateway', type: 'service', status: 'Operational' },
+        { name: 'API', type: 'service', status: 'Operational' },
+        { name: 'Build & Deploy', type: 'service', status: 'Operational' },
+        { name: 'CI/CD', type: 'service', status: 'Operational' },
+        { name: 'Community', type: 'service', status: 'Operational' },
+        { name: 'Cron Jobs', type: 'service', status: 'Operational' },
+        { name: 'Dashboard', type: 'service', status: 'Operational' },
+        { name: 'Data Cache', type: 'service', status: 'Operational' },
+        { name: 'DNS', type: 'service', status: 'Operational' },
+        { name: 'Domain Registration', type: 'service', status: 'Operational' },
+        { name: 'Edge Functions', type: 'service', status: 'Operational' },
+        { name: 'Edge Middleware', type: 'service', status: 'Operational' },
+        { name: 'Edge Network', type: 'service', status: 'Operational' },
+        { name: 'Firewall', type: 'service', status: 'Operational' },
+        { name: 'Image Optimization', type: 'service', status: 'Operational' },
+        { name: 'Logs', type: 'service', status: 'Operational' },
+        { name: 'Marketplace', type: 'service', status: 'Operational' },
+    ];
+
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    // Auto-rotate the carousel
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setActiveIndex((prev) => (prev + 1) % services.length);
+        }, 2500); // Change every 2.5 seconds
+        return () => clearInterval(interval);
+    }, []);
+
+    // Generate random history bars for the visualization (90 bars)
+    // We memoize this to avoid regeneration on every render, though in this simple case it's fine.
+    // We'll just generate them deterministically based on name length to keep it consistent but "random"
+    const getBars = (name: string) => {
+        const seed = name.length;
+        return Array.from({ length: 40 }).map((_, i) => {
+            // Mostly operational (green), occasional "incident" (yellow/red)
+            // But user asked for "Green for good, Red for bad", and "Operational".
+            // Let's keep it mostly green to match "Operational" status.
+            const isDown = (i + seed) % 67 === 0;
+            const isDegraded = (i + seed) % 43 === 0;
+            return isDown ? 'bg-red-500' : isDegraded ? 'bg-yellow-400' : 'bg-emerald-500';
+        });
+    };
+
+    return (
+        <div className="relative h-[320px] w-full flex items-center justify-center perspective-1000 overflow-hidden">
+            <div className="absolute inset-0 z-0 bg-transparent" /> {/* Spacer */}
+
+            {services.map((service, index) => {
+                // Calculate distance from active index for the carousel effect
+                let offset = index - activeIndex;
+                if (offset > services.length / 2) offset -= services.length;
+                if (offset < -services.length / 2) offset += services.length;
+
+                // Render only visible items
+                if (Math.abs(offset) > 2) return null;
+
+                const isActive = offset === 0;
+                const isSummary = service.type === 'summary';
+
+                return (
+                    <motion.div
+                        key={service.name}
+                        initial={false}
+                        animate={{
+                            y: offset * 85, // Vertical spacing
+                            scale: isActive ? 1 : 1 - Math.abs(offset) * 0.1,
+                            opacity: isActive ? 1 : 0.6 - Math.abs(offset) * 0.2,
+                            z: isActive ? 0 : -100 * Math.abs(offset),
+                            rotateX: offset * -15,
+                        }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className={`absolute w-[90%] md:w-[400px] rounded-xl border backdrop-blur-md transition-colors duration-500 flex flex-col p-5
+                            ${isActive
+                                ? 'bg-white dark:bg-slate-900 border-brand-200 dark:border-brand-900 shadow-2xl z-20'
+                                : 'bg-white/80 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 shadow-lg z-10'
+                            }`}
+                    >
+                        {/* Summary Card Design */}
+                        {isSummary ? (
+                            <div className="flex flex-col items-center justify-center text-center h-full gap-2 py-2">
+                                <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-1">
+                                    <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-emerald-600 dark:text-emerald-400" stroke="currentColor" strokeWidth="2">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">All Systems Operational</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Everything is running smoothly.</p>
+                            </div>
+                        ) : (
+                            /* Service Status Card Design */
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="font-semibold text-slate-900 dark:text-slate-200 text-lg flex items-center gap-2">
+                                        {/* Simple icon based on name length just to vary it slightly if we wanted, or generic server icon */}
+                                        {service.name}
+                                    </h4>
+                                    <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-1 rounded-full border border-emerald-100 dark:border-emerald-900/50">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        Operational
+                                    </span>
+                                </div>
+
+                                {/* Status Bars Visualization */}
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex justify-between text-[10px] text-slate-400 font-mono uppercase tracking-wider">
+                                        <span>90 days ago</span>
+                                        <span className="text-slate-500 dark:text-slate-300">Today</span>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-[2px] h-6 mt-1">
+                                        {getBars(service.name).map((colorClass, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={`flex-1 rounded-sm h-full ${colorClass} opacity-90 hover:opacity-100 transition-opacity`}
+                                            ></div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </motion.div>
+                );
+            })}
+        </div>
+    );
+};
+
+// Matrix/Hashing Animation Component
+const SecureHashAnimation = () => {
+    const [hashes, setHashes] = useState<string[]>([]);
+
+    useEffect(() => {
+        const generateHash = () => {
+            const chars = '0123456789ABCDEF';
+            let hash = '0x';
+            for (let i = 0; i < 24; i++) {
+                hash += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return hash;
+        };
+
+        // Create initial batch
+        setHashes(Array.from({ length: 10 }, generateHash));
+
+        const interval = setInterval(() => {
+            setHashes(prev => {
+                const newHash = generateHash();
+                return [newHash, ...prev.slice(0, 9)];
+            });
+        }, 100);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none select-none" style={{ maskImage: 'linear-gradient(to top, transparent, black)' }}>
+            <div className="absolute top-0 right-0 p-8 text-[10px] font-mono leading-tight text-right w-full">
+                {hashes.map((hash, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1 - (i * 0.1), x: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="text-emerald-500 dark:text-emerald-400 whitespace-nowrap font-bold"
+                    >
+                        {hash}
+                    </motion.div>
+                ))}
+            </div>
+            {/* Matrix rain effect simplified */}
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent dark:from-slate-900 z-10"></div>
+        </div>
+    );
+};
+
+// Terminal Installation Animation Component
+const TerminalAnimation = () => {
+    const [lines, setLines] = useState<React.ReactNode[]>([<span key="init" className="text-slate-500">$ </span>]);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const runAnimation = async () => {
+            if (!isMounted) return;
+
+            // 1. Start clean
+            setLines([<span key="prompt" className="text-slate-400 mr-2">$</span>]);
+            await new Promise(r => setTimeout(r, 1000));
+            if (!isMounted) return;
+
+            // 2. Type command
+            const command = "npm install rojifi";
+            for (let i = 0; i <= command.length; i++) {
+                setLines([
+                    <div key="cmd">
+                        <span className="text-slate-400 mr-2">$</span>
+                        <span className="text-white">{command.slice(0, i)}</span>
+                        {i < command.length && <span className="animate-pulse inline-block w-2 h-4 bg-slate-500 ml-1 align-middle"></span>}
+                    </div>
+                ]);
+                await new Promise(r => setTimeout(r, 50 + Math.random() * 30));
+                if (!isMounted) return;
+            }
+
+            await new Promise(r => setTimeout(r, 500));
+            if (!isMounted) return;
+
+            // 3. Show installation progress
+            const installLines = [
+                <div key="l1" className="text-slate-400">root@dev:~/project</div>,
+                <div key="l2" className="text-blue-400">added 1 package, and audited 2 packages in 3s</div>,
+                <div key="l3" className="text-green-400">found 0 vulnerabilities</div>,
+                <div key="l4" className="text-slate-500 mt-2">Installing dependencies...</div>,
+                <div key="l5" className="text-slate-300">[====================] 100%</div>,
+                <div key="l6" className="text-slate-400 mt-2">+ rojifi@2.0.0</div>,
+                <div key="l7" className="text-green-500 font-bold">Success! Ready to build.</div>,
+                <div key="prompt2" className="mt-2 text-slate-400">$ <span className="animate-pulse inline-block w-2 h-4 bg-slate-500 ml-1 align-middle"></span></div>
+            ];
+
+            // Render lines with delays
+            const currentCmd = (
+                <div key="cmd-final">
+                    <span className="text-slate-400 mr-2">$</span>
+                    <span className="text-white">npm install rojifi</span>
+                </div>
+            );
+
+            setLines([currentCmd]); // Lock command
+
+            // Simulation of "doing work"
+            await new Promise(r => setTimeout(r, 400));
+            if (!isMounted) return;
+            setLines(prev => [...prev, <div key="progress1" className="text-slate-500 text-xs mt-1">⠋ resolving packages...</div>]);
+
+            await new Promise(r => setTimeout(r, 600));
+            if (!isMounted) return;
+            setLines(prev => {
+                const newLines = [...prev];
+                newLines.pop(); // remove spinner
+                return [...newLines, <div key="progress2" className="text-slate-500 text-xs mt-1">⠙ fetching tarballs...</div>];
+            });
+
+            await new Promise(r => setTimeout(r, 600));
+            if (!isMounted) return;
+            setLines(prev => {
+                const newLines = [...prev];
+                newLines.pop(); // remove spinner
+                return [...newLines,
+                <div key="added" className="text-green-400 text-xs mt-1 font-mono">
+                    <span className="text-slate-500">+</span> rojifi@2.0.0
+                </div>,
+                <div key="stats" className="text-slate-400 text-xs">added 1 package in 1.4s</div>,
+                <div key="done" className="text-green-500 text-xs font-bold mt-2">Done</div>,
+                <div key="prompt-final" className="mt-2 text-slate-400 text-xs">$ <span className="animate-pulse inline-block w-1.5 h-3 bg-slate-500 ml-1 align-middle"></span></div>
+                ];
+            });
+
+            // Loop
+            await new Promise(r => setTimeout(r, 4000));
+            if (isMounted) runAnimation();
+        };
+
+        runAnimation();
+
+        return () => { isMounted = false; };
+    }, []);
+
+    return (
+        <div className="font-mono text-xs md:text-sm p-4 h-full flex flex-col justify-end bg-black/50 rounded-lg border border-white/10 shadow-inner overflow-hidden relative">
+            {/* Scanlines */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-20 pointer-events-none bg-[length:100%_2px,3px_100%] opacity-20"></div>
+
+            <div className="relative z-10 flex flex-col justify-end min-h-0">
+                {lines}
+            </div>
         </div>
     );
 };
@@ -467,7 +750,8 @@ function Homepage() {
                                     <Carousel3D />
                                 </div>
                             </div>
-                        </motion.div>                        {/* Card 2: Developer First (Tall) */}
+                        </motion.div>
+                        {/* Card 2: Developer First (Tall) */}
                         <motion.div
                             initial="offscreen"
                             whileInView="onscreen"
@@ -476,19 +760,32 @@ function Homepage() {
                                 offscreen: { y: 50, opacity: 0, scale: 0.95 },
                                 onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.1 } }
                             }}
-                            className="md:col-span-2 relative rounded-3xl bg-slate-900 text-white p-8 overflow-hidden flex flex-col justify-between"
+                            className="md:col-span-2 relative rounded-3xl bg-slate-900 text-white p-6 overflow-hidden flex flex-col border border-slate-800"
                         >
-                            <div className="relative z-10">
-                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 text-white mb-6">
-                                    <Terminal className="w-6 h-6" />
+                            <div className="relative z-10 mb-4 flex-shrink-0">
+                                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 text-white mb-4 backdrop-blur-sm border border-white/5">
+                                    <Terminal className="w-5 h-5" />
                                 </div>
-                                <h3 className="text-xl font-bold mb-2">Developer First</h3>
+                                <h3 className="text-xl font-bold mb-1">Developer First</h3>
                                 <p className="text-slate-400 text-sm">Top-tier typed SDKs.</p>
                             </div>
-                            <div className="mt-6 bg-black/30 rounded-lg p-3 font-mono text-xs text-green-400 border border-white/10">
-                                <div>$ npm install rojifi</div>
-                                <div className="text-slate-500 mt-1">+ rojifi@2.0.0</div>
-                                <div className="text-slate-500">added 1 package</div>
+
+                            {/* Terminal Animation Container */}
+                            <div className="flex-1 w-full relative rounded-lg overflow-hidden bg-[#1e1e1e] shadow-2xl border border-white/5 flex flex-col">
+                                {/* Terminal Header */}
+                                <div className="flex items-center gap-1.5 px-3 py-2 bg-white/5 border-b border-white/5 flex-shrink-0">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
+                                    <div className="ml-auto text-[10px] text-slate-500 font-mono">zsh — 80x24</div>
+                                </div>
+
+                                {/* Terminal Body */}
+                                <div className="flex-1 min-h-[140px] relative">
+                                    <div className="absolute inset-0">
+                                        <TerminalAnimation />
+                                    </div>
+                                </div>
                             </div>
                         </motion.div>
 
@@ -501,21 +798,32 @@ function Homepage() {
                                 offscreen: { y: 50, opacity: 0, scale: 0.95 },
                                 onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.2 } }
                             }}
-                            className="md:col-span-2 relative rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden group"
+                            className="md:col-span-2 relative rounded-3xl bg-slate-900 overflow-hidden group border border-slate-800"
                         >
-                            <div className="relative z-10">
-                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 mb-6">
-                                    <ShieldCheck className="w-6 h-6" />
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Secure</h3>
-                                <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                    PCI-DSS Level 1 Compliant. Default encryption.
-                                </p>
+                            {/* Matrix Background */}
+                            <div className="absolute inset-0 z-0">
+                                <SecureHashAnimation />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90"></div>
                             </div>
-                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-colors"></div>
+
+                            <div className="relative z-10 p-8 h-full flex flex-col justify-between">
+                                <div>
+                                    <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 mb-6 border border-emerald-500/30 backdrop-blur-sm">
+                                        <ShieldCheck className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-white mb-2">Secure</h3>
+                                    <p className="text-slate-400 text-sm">
+                                        PCI-DSS Level 1 Compliant. Default encryption.
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-500/70 mt-4">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    ENCRYPTION_ACTIVE: AES-256
+                                </div>
+                            </div>
                         </motion.div>
 
-                        {/* Card 4: Uptime (Wide) */}
+                        {/* Card 4: Uptime (Wide) -> Now Status Page Carousel */}
                         <motion.div
                             initial="offscreen"
                             whileInView="onscreen"
@@ -524,27 +832,34 @@ function Homepage() {
                                 offscreen: { y: 50, opacity: 0, scale: 0.95 },
                                 onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.3 } }
                             }}
-                            className="md:col-span-4 relative rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden flex items-center justify-between"
+                            className="md:col-span-4 relative rounded-3xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden group flex flex-col md:flex-row items-center justify-between"
+                            style={{ minHeight: '320px' }}
                         >
-                            <div className="relative z-10 max-w-sm">
-                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mb-6">
+                            {/* Left Content */}
+                            <div className="relative z-10 w-full md:w-1/3 mb-8 md:mb-0">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 mb-6 backdrop-blur-md">
                                     <Server className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">99.99% Uptime</h3>
-                                <p className="text-slate-600 dark:text-slate-400">
-                                    Redundant architecture that scales automatically with your traffic peaks.
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Real-time Status</h3>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                                    Transparency at the core. Monitor our systems 24/7 with our public status dashboard.
                                 </p>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-medium border border-emerald-200 dark:border-emerald-800">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                    All Systems Operational
+                                </div>
                             </div>
-                            <div className="hidden sm:flex gap-1 h-16 items-end">
-                                {[40, 60, 45, 70, 50, 80, 65, 90, 75, 55, 60, 50].map((h, i) => (
-                                    <motion.div
-                                        key={i}
-                                        initial={{ height: "10%" }}
-                                        whileInView={{ height: `${h}%` }}
-                                        transition={{ duration: 1, delay: i * 0.05 }}
-                                        className="w-3 bg-brand-200 dark:bg-brand-900 rounded-t-sm"
-                                    ></motion.div>
-                                ))}
+
+                            {/* Right Visualization - The Carousel */}
+                            <div className="relative w-full md:w-2/3 h-[280px] flex items-center justify-center">
+                                {/* Gradient Overlays for Tunnel/Fade Effect */}
+                                <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-slate-50 to-transparent dark:from-slate-950 dark:to-transparent z-20 pointer-events-none"></div>
+                                <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-50 to-transparent dark:from-slate-950 dark:to-transparent z-20 pointer-events-none"></div>
+
+                                <StatusCarousel />
                             </div>
                         </motion.div>
                     </div>
