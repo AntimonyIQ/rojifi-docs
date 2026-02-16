@@ -2,29 +2,36 @@
 
 Official documentation website for the Rojifi REST API built with React, TypeScript, Vite, and Tailwind CSS.
 
-## Features
-
-- 🚀 Fast development with Vite
-- ⚛️ React 19 with React Router for routing
-- 🎨 Tailwind CSS for styling
-- 📱 Fully responsive design
-- 📚 Comprehensive API documentation
-- 🔷 Built with TypeScript for type safety
-
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
-1. Clone the repository
+1. Clone the repository.
 2. Install dependencies:
 
 ```bash
 npm install
+```
+
+### Environment Configuration
+
+This project uses environment variables to control content visibility. Pages in the documentation data marked with `status: 'DEV'` are only visible when the environment is set to development.
+
+Create a `.env` file in the root directory (or set these variables in your shell):
+
+**For Development (Shows all content including DEV status pages):**
+```bash
+VITE_DOCS_ENV=development
+```
+
+**For Production (Hides DEV status pages):**
+```bash
+VITE_DOCS_ENV=production
 ```
 
 ### Development
@@ -35,7 +42,7 @@ Start the development server:
 npm run dev
 ```
 
-The site will be available at `http://localhost:5173`
+The site will be available at `http://localhost:5173`.
 
 ### Build
 
@@ -45,7 +52,9 @@ Build for production:
 npm run build
 ```
 
-Preview the production build:
+The build artifacts will be stored in the `dist/` directory.
+
+Preview the local production build:
 
 ```bash
 npm run preview
@@ -53,19 +62,19 @@ npm run preview
 
 ## Project Structure
 
-- `/` - Homepage introducing the Rojifi REST API
-- `/docs` - Documentation with sidebar layout
-- `/docs/authentication` - Authentication guide
-- `/docs/endpoints` - API endpoints reference
-- `/docs/errors` - Error handling documentation
-- `/docs/rate-limits` - Rate limits information
-- `/docs/examples` - Code examples
+The documentation is data-driven, powered by a single TypeScript file that defines the structure, navigation, and content.
+
+- `src/data/docs.ts`: The single source of truth for all documentation content. It defines versions, tabs (Guides, API Reference, SDKs), categories, and pages.
+- `src/layouts/DocsLayout.tsx`: The main layout component handling the sidebar navigation, top tabs, version switching, and search functionality.
+- `src/pages/DocsPage.tsx`: The generic page component that renders content based on the current route parameters (`version`, `tab`, `slug`).
+- `src/App.tsx`: Handles routing logic and redirects (e.g., `/docs` -> `/docs/v1/guides/getting-started`).
 
 ## Technologies
 
-- **Vite** - Build tool and dev server
-- **React** - UI framework
-- **TypeScript** - Type-safe JavaScript
-- **React Router** - Client-side routing
-- **Tailwind CSS** - Utility-first CSS framework
-- **ESLint** - Code linting
+- Vite
+- React
+- TypeScript
+- React Router
+- Tailwind CSS
+- Lucide React (Icons)
+
