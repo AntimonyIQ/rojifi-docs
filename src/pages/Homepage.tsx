@@ -1,248 +1,636 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import MainLayout from "../layouts/MainLayout";
-import { Terminal, ShieldCheck, ArrowRight, Code, Server, Globe } from "lucide-react";
+import { Terminal, ShieldCheck, ArrowRight, Code, Server, Globe, Play, CheckCircle2, ChevronRight } from "lucide-react";
 import D3Network from "../components/D3Network";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+const CodeWindow = () => {
+    const [step, setStep] = useState(0); // 0: typing, 1: ready (show button), 2: clicked (simulate click), 3: running, 4: success
+    const [displayedCode, setDisplayedCode] = useState("");
+
+    // We'll use a pre-highlighted structural representation to keep it simple while allowing typing
+    // Since true syntax highlighting during typing is complex without a library, 
+    // we will type out plain text but render the final version with colors once typing is done.
+    // OR we can just type characters.
+
+    // Let's stick to the previous simple typing for now, but apply colors after typing finishes?
+    // No, user wants it to look like code.
+
+    // Better approach: Static code block that is revealed character by character?
+    // Actually, let's just use the colored spans from the previous version, but reveal them.
+    // That's hard to animate character by character.
+
+    // Compromise: Type plain text, then instantly switch to highlighted text when done typing? 
+    // Or just highlight keywords using regex replacement on the displayed string.
+
+    const plainCode = `const rojifi = require('rojifi')('sk_test_...');
+
+// Create a payment intent
+const payment = await rojifi.paymentIntents.create({
+  amount: 2000,
+  currency: 'usd',
+  payment_method_types: ['card'],
+});`;
+
+    // More robust rendering: 
+    // We will render the full colored code, but mask it based on character count.
+
+    // Typing effect
+    useEffect(() => {
+        if (step !== 0) return;
+
+        let currentIndex = 0;
+        setDisplayedCode(""); // Reset code display
+
+        const typingInterval = setInterval(() => {
+            if (currentIndex <= plainCode.length) {
+                setDisplayedCode(plainCode.slice(0, currentIndex));
+                currentIndex++;
+            } else {
+                clearInterval(typingInterval);
+                setTimeout(() => setStep(1), 500); // Ready state
+            }
+        }, 15); // Faster typing
+
+        return () => clearInterval(typingInterval);
+    }, [step]);
+
+    // Sequencer for the automation
+    useEffect(() => {
+        if (step === 1) {
+            // Wait a bit, then simulate click
+            const timeout = setTimeout(() => {
+                setStep(2); // Click state
+            }, 800);
+            return () => clearTimeout(timeout);
+        }
+        if (step === 2) {
+            // Hold click state briefly, then run
+            const timeout = setTimeout(() => {
+                setStep(3); // Running
+            }, 300);
+            return () => clearTimeout(timeout);
+        }
+        if (step === 3) {
+            // Run duration
+            const timeout = setTimeout(() => {
+                setStep(4); // Success
+            }, 1500);
+            return () => clearTimeout(timeout);
+        }
+        if (step === 4) {
+            // Animation loop: Reset after 4 seconds
+            const timeout = setTimeout(() => {
+                setStep(0);
+            }, 4000);
+            return () => clearTimeout(timeout);
+        }
+    }, [step]);
+
+    // Quick and dirty syntax highlighting for the static code display
+    // We construct the "rich" view and overlay it, or just use dangerous HTML
+    // Ideally we'd use a library, but let's do a reliable manual highlight render
+    const CodeLine = ({ text }: { text: string }) => {
+        // Comment
+        if (text.trim().startsWith("//")) {
+            return <span className="text-slate-500 italic">{text}</span>;
+        }
+
+        const parts = text.split(/('.*?'|\s+|[(){}[\],.;:])/g).filter(Boolean);
+
+        return (
+            <span>
+                {parts.map((part, i) => {
+                    if (part === 'const' || part === 'await' || part === 'require')
+                        return <span key={i} className="text-purple-400 font-semibold">{part}</span>;
+                    if (part === 'rojifi' || part === 'payment' || part === 'console')
+                        return <span key={i} className="text-blue-400">{part}</span>;
+                    if (part === 'create' || part === 'log')
+                        return <span key={i} className="text-yellow-300">{part}</span>;
+                    if (part.startsWith("'"))
+                        return <span key={i} className="text-green-400">{part}</span>;
+                    if (!isNaN(Number(part)))
+                        return <span key={i} className="text-orange-400">{part}</span>;
+                    if (part.match(/[(){}[\]]/))
+                        return <span key={i} className="text-yellow-600 dark:text-yellow-500">{part}</span>;
+                    return <span key={i} className="text-slate-300">{part}</span>;
+                })}
+            </span>
+        );
+    };
+
+    return (
+        <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden min-h-[320px] flex flex-col relative">
+            {/* Window Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 px-4 py-3">
+                <div className="flex items-center space-x-2">
+                    <span className="flex h-3 w-3 items-center justify-center rounded-full bg-red-500/80"></span>
+                    <span className="flex h-3 w-3 items-center justify-center rounded-full bg-yellow-500/80"></span>
+                    <span className="flex h-3 w-3 items-center justify-center rounded-full bg-green-500/80"></span>
+                </div>
+                <div className="text-xs font-mono text-slate-500 flex items-center gap-2">
+                    <Code className="w-3 h-3" />
+                    payment-flow.js
+                </div>
+                <div className={`text-xs px-2 py-0.5 rounded transition-colors ${step >= 3 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}>
+                    {step === 0 ? 'Typing...' : step <= 2 ? 'Ready' : step === 3 ? 'Running...' : 'Success'}
+                </div>
+            </div>
+
+            {/* Editor Body */}
+            <div className="p-6 overflow-x-auto bg-[#0d1117] dark:bg-[#0d1117] flex-1 relative font-mono text-sm leading-relaxed">
+                <pre className="font-mono text-sm">
+                    {/* 
+                        We only render properly colors when typing is nearing completion or complete to avoid complexity.
+                        Actually, let's just render the "dumb" text while typing, and "smart" text fully when done?
+                        Or better: Just render dumb text. The user asked for colors.
+                    */}
+                    {step === 0 ? (
+                        <code className="text-slate-300">
+                            {displayedCode}
+                            <span className="animate-pulse inline-block w-2 h-4 bg-brand-500 ml-1 align-middle"></span>
+                        </code>
+                    ) : (
+                        <code className="block">
+                            <div className="leading-relaxed">
+                                <CodeLine text="const rojifi = require('rojifi')('sk_test_...');" />
+                                <br /><br />
+                                <CodeLine text="// Create a payment intent" />
+                                <br />
+                                <CodeLine text="const payment = await rojifi.paymentIntents.create({" />
+                                <br />
+                                <span className="pl-4"><CodeLine text="amount: 2000," /></span>
+                                <br />
+                                <span className="pl-4"><CodeLine text="currency: 'usd'," /></span>
+                                <br />
+                                <span className="pl-4"><CodeLine text="payment_method_types: ['card']," /></span>
+                                <br />
+                                <CodeLine text="});" />
+                            </div>
+                        </code>
+                    )}
+                </pre>
+
+                {/* Automated Run Button */}
+                <AnimatePresence>
+                    {(step === 1 || step === 2) && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="absolute bottom-6 right-6"
+                        >
+                            <motion.button
+                                animate={step === 2 ? { scale: 0.95, filter: "brightness(0.9)" } : { scale: 1 }}
+                                className={`flex items-center text-sm font-semibold px-4 py-2 rounded shadow-lg transition-all ${step === 2 ? 'bg-brand-700 text-white shadow-inner' : 'bg-brand-600 text-white'
+                                    }`}
+                            >
+                                <Play className="w-4 h-4 mr-2" fill="currentColor" />
+                                Run Code
+                                {/* Cursor simulation */}
+                                <motion.div
+                                    initial={{ opacity: 0, x: 20, y: 20 }}
+                                    animate={{ opacity: 1, x: 10, y: 10 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="absolute -bottom-4 -right-4 pointer-events-none"
+                                >
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5.65376 12.3673H5.46026L5.31717 12.4976L0.500002 16.8829L0.500002 1.19841L11.7841 12.3673H5.65376Z" fill="black" stroke="white" />
+                                    </svg>
+                                </motion.div>
+                            </motion.button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* Terminal Drawer (Slides up) */}
+            <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: step >= 3 ? '140px' : 0 }}
+                className="bg-[#1e1e1e] border-t border-slate-800 overflow-hidden text-xs font-mono"
+            >
+                <div className="p-4 text-slate-300 space-y-2">
+                    <div className="flex items-center gap-2">
+                        <ChevronRight className="w-3 h-3 text-slate-500" />
+                        <span className="text-slate-100">node payment-flow.js</span>
+                    </div>
+
+                    {step >= 3 && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-yellow-500"
+                        >
+                            ➜ Initiating payment sequence...
+                        </motion.div>
+                    )}
+
+                    {step === 4 && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="space-y-2"
+                        >
+                            <div className="text-slate-400">Verifying merchant credentials... OK</div>
+                            <div className="flex items-center gap-2 text-green-400">
+                                <CheckCircle2 className="w-3 h-3" />
+                                <span className="font-bold">Payment Intent Created:</span>
+                                <span className="text-slate-400">pi_3Mtw...2e</span>
+                            </div>
+                            <div className="text-slate-500 mt-2">✨ Process completed in 142ms</div>
+                        </motion.div>
+                    )}
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
+// 3D Vertical Carousel Component
+const Carousel3D = () => {
+    const currencies = [
+        { code: 'USD', flag: 'us', name: 'United States Dollar' },
+        { code: 'CNY', flag: 'cn', name: 'Chinese Yuan' },
+        { code: 'EUR', flag: 'eu', name: 'Euro' },
+        { code: 'GBP', flag: 'gb', name: 'British Pound' },
+        { code: 'AUD', flag: 'au', name: 'Australian Dollar' },
+        { code: 'NZD', flag: 'nz', name: 'New Zealand Dollar' },
+        { code: 'SGD', flag: 'sg', name: 'Singapore Dollar' },
+        { code: 'HKD', flag: 'hk', name: 'Hong Kong Dollar' },
+        { code: 'JPY', flag: 'jp', name: 'Japanese Yen' },
+        { code: 'CHF', flag: 'ch', name: 'Swiss Franc' },
+    ];
+
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setActiveIndex((prev) => (prev + 1) % currencies.length);
+        }, 2000); // Change every 2 seconds
+        return () => clearInterval(interval);
+    }, []);
+
+    // We want to show: previous, current, next
+    // But for a smooth infinite loop, we need a window.
+    // Let's render ALL of them but with absolute positioning based on distance from activeIndex.
+
+    return (
+        <div className="relative h-[240px] w-full flex items-center justify-center perspective-1000">
+            {currencies.map((currency, index) => {
+                // Calculate distance from active index
+                // Handle wrap-around logic for distance
+                let offset = index - activeIndex;
+                if (offset > currencies.length / 2) offset -= currencies.length;
+                if (offset < -currencies.length / 2) offset += currencies.length;
+
+                // Only render items that are close to the center to save resources and cleaner DOM
+                if (Math.abs(offset) > 2) return null;
+
+                const isActive = offset === 0;
+
+                return (
+                    <motion.div
+                        key={currency.code}
+                        initial={false}
+                        animate={{
+                            y: offset * 70, // Vertical spacing
+                            scale: isActive ? 1 : 1 - Math.abs(offset) * 0.2, // Scale down non-active
+                            opacity: isActive ? 1 : 1 - Math.abs(offset) * 0.4, // Fade out non-active
+                            z: isActive ? 0 : -100 * Math.abs(offset), // Push back in 3D
+                            rotateX: offset * -10, // Rotate slightly
+                        }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className={`absolute w-64 p-4 rounded-xl border backdrop-blur-md flex items-center gap-4 transition-colors duration-500
+                            ${isActive
+                                ? 'bg-white dark:bg-slate-900 border-brand-200 dark:border-brand-900 shadow-xl z-20'
+                                : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 shadow-sm z-10'
+                            }`}
+                    >
+                        <div className="w-10 h-10 rounded-full overflow-hidden shadow-sm flex-shrink-0 border border-slate-100 dark:border-slate-700">
+                            <img
+                                src={`https://flagfeed.com/flags/${currency.flag}`}
+                                alt={currency.code}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                                <span className={`font-bold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
+                                    {currency.code}
+                                </span>
+                                {isActive && (
+                                    <span className="text-xs font-medium text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+                                        Active
+                                    </span>
+                                )}
+                            </div>
+                            <div className={`text-xs truncate ${isActive ? 'text-slate-500 dark:text-slate-400' : 'text-slate-400 dark:text-slate-600'}`}>
+                                {currency.name}
+                            </div>
+                        </div>
+                    </motion.div>
+                );
+            })}
+        </div>
+    );
+};
 
 function Homepage() {
 
-  const features = [
-    {
-      icon: <Globe className="w-6 h-6" />,
-      title: "Global Payments",
-      desc: "Accept payments from anywhere with a single, unified API integration."
-    },
-    {
-      icon: <Terminal className="w-6 h-6" />,
-      title: "Developer First",
-      desc: "Designed for developers. Typed SDKs, clear documentation, and easy testing."
-    },
-    {
-      icon: <ShieldCheck className="w-6 h-6" />,
-      title: "Secure by Default",
-      desc: "PCI-DSS Level 1 compliant. Fraud detection and data encryption built-in."
-    },
-    {
-      icon: <Server className="w-6 h-6" />,
-      title: "99.99% Uptime",
-      desc: "Reliable infrastructure that scales with your business automatically."
-    }
-  ];
 
-  return (
-    <MainLayout>
-      <div className="relative isolate overflow-hidden">
-        {/* D3 Background Animation */}
-        <D3Network />
+    return (
+        <MainLayout>
+            <div className="relative isolate overflow-hidden">
+                {/* D3 Background Animation */}
+                <D3Network />
 
-        {/* Hero Section */}
-        <div className="container mx-auto px-4 pt-32 pb-20 sm:pt-40 sm:pb-24 lg:pb-32">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1 text-sm leading-6 text-slate-600 dark:text-slate-400 mb-8 backdrop-blur-sm">
-                <span className="flex h-2 w-2 rounded-full bg-brand-500 mr-2"></span>
-                Introducing API  v2.0
-              </div>
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 font-display">
-                Financial infra for <br />
-                <span className="text-brand-600 dark:text-brand-400">internet scale</span>.
-              </h1>
-              <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-400 max-w-xl">
-                Rojifi provides the building blocks for modern financial applications.
-                Accept payments, manage identity, and scale your business with a developer-first API.
-              </p>
-              <div className="mt-10 flex items-center gap-x-6">
-                <Link
-                  to="/docs"
-                  className="group relative inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-brand-600 dark:bg-brand-500 border border-transparent rounded hover:bg-brand-700 dark:hover:bg-brand-400 transition-all duration-200"
-                >
-                  Start Building
-                  <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-                <Link
-                  to="/docs/endpoints"
-                  className="text-sm font-semibold leading-6 text-slate-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
-                >
-                  View API Reference <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </motion.div>
+                {/* Hero Section */}
+                <div className="container mx-auto px-4 pt-32 pb-20 sm:pt-40 sm:pb-24 lg:pb-32">
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <div className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1 text-sm leading-6 text-slate-600 dark:text-slate-400 mb-8 backdrop-blur-sm">
+                                <span className="flex h-2 w-2 rounded-full bg-brand-500 mr-2"></span>
+                                Introducing API  v2.0
+                            </div>
+                            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 font-display">
+                                Financial infra for <br />
+                                <span className="text-brand-600 dark:text-brand-400">internet scale</span>.
+                            </h1>
+                            <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-400 max-w-xl">
+                                Rojifi provides the building blocks for modern financial applications.
+                                Accept payments, manage identity, and scale your business with a developer-first API.
+                            </p>
+                            <div className="mt-10 flex items-center gap-x-6">
+                                <Link
+                                    to="/docs"
+                                    className="group relative inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-brand-600 dark:bg-brand-500 border border-transparent rounded hover:bg-brand-700 dark:hover:bg-brand-400 transition-all duration-200"
+                                >
+                                    Start Building
+                                    <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                                <Link
+                                    to="/docs/endpoints"
+                                    className="text-sm font-semibold leading-6 text-slate-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+                                >
+                                    View API Reference <span aria-hidden="true">→</span>
+                                </Link>
+                            </div>
+                        </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-none overflow-hidden">
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 px-4 py-3">
-                  <div className="flex items-center space-x-2">
-                    <span className="flex h-3 w-3 items-center justify-center rounded-full border border-slate-300 dark:border-slate-700 bg-transparent"></span>
-                    <span className="flex h-3 w-3 items-center justify-center rounded-full border border-slate-300 dark:border-slate-700 bg-transparent"></span>
-                    <span className="flex h-3 w-3 items-center justify-center rounded-full border border-slate-300 dark:border-slate-700 bg-transparent"></span>
-                  </div>
-                  <div className="text-xs font-mono text-slate-500">create-payment.js</div>
-                </div>
-                <div className="p-6 overflow-x-auto bg-white dark:bg-slate-950">
-                  <pre className="text-sm font-mono leading-relaxed">
-                    <code className="language-javascript">
-                      <span className="text-purple-600 dark:text-purple-400">const</span> <span className="text-blue-600 dark:text-blue-400">rojifi</span> = <span className="text-purple-600 dark:text-purple-400">require</span>(<span className="text-green-600 dark:text-green-400">'rojifi'</span>)(<span className="text-green-600 dark:text-green-400">'sk_test_...'</span>);{"\n\n"}
-                      <span className="text-slate-500 dark:text-slate-400">// Create a payment intent</span>{"\n"}
-                      <span className="text-purple-600 dark:text-purple-400">const</span> payment = <span className="text-purple-600 dark:text-purple-400">await</span> rofiji.paymentIntents.<span className="text-yellow-600 dark:text-yellow-400">create</span>({"{"}{"\n"}
-                      {"  "}amount: <span className="text-orange-600 dark:text-orange-400">2000</span>,{"\n"}
-                      {"  "}currency: <span className="text-green-600 dark:text-green-400">'usd'</span>,{"\n"}
-                      {"  "}payment_method_types: [<span className="text-green-600 dark:text-green-400">'card'</span>],{"\n"}
-                      {"}"});
-                    </code>
-                  </pre>
-                </div>
-              </div>
-              {/* Decorative elements behind code block */}
-              <div className="absolute -z-10 -top-4 -right-4 w-full h-full border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-900/50"></div>
-            </motion.div>
-            </div>
-        </div>
-      </div>
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            className="relative"
+                        >
+                            <CodeWindow />
 
-      {/* Stats Section - Clean Grid */}
-      <div className="border-y border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-        <div className="container mx-auto px-4">
-          <dl className="grid grid-cols-2 gap-px bg-slate-200 dark:bg-slate-800 sm:grid-cols-4">
-            <div className="bg-white dark:bg-slate-950 p-6 sm:p-10">
-              <dt className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">Transaction Volume</dt>
-              <dd className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">$10B+</dd>
-            </div>
-            <div className="bg-white dark:bg-slate-950 p-6 sm:p-10">
-              <dt className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">Uptime SLA</dt>
-              <dd className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">99.99%</dd>
-            </div>
-            <div className="bg-white dark:bg-slate-950 p-6 sm:p-10">
-              <dt className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">Global Reach</dt>
-              <dd className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">135+</dd>
-            </div>
-            <div className="bg-white dark:bg-slate-950 p-6 sm:p-10">
-              <dt className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">latency</dt>
-              <dd className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">&lt;80ms</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
-
-      {/* Features Grid */}
-      <section className="py-24 bg-slate-50 dark:bg-slate-950" id="features">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto lg:text-center mb-16">
-            <h2 className="text-base font-semibold leading-7 text-brand-600 dark:text-brand-400">Build faster</h2>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">Everything you need to scale</p>
-            <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-400">
-              A complete financial stack, designed from the ground up to be the best way to move money on the internet.
-            </p>
-            </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, idx) => (
-              <motion.div
-                key={idx}
-                whileHover={{ y: -5 }}
-                className="p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded hover:border-brand-500 dark:hover:border-brand-500 transition-colors group"
-              >
-                <div className="w-12 h-12 flex items-center justify-center rounded bg-slate-50 dark:bg-slate-800 text-brand-600 dark:text-brand-400 mb-6 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/20 transition-colors">
-                  {feature.icon}
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{feature.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
-                  {feature.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Integration Section */}
-      <section className="py-24 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="order-2 lg:order-1">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center">
-                  <div className="font-mono text-xl font-bold mb-2">REST</div>
-                  <div className="text-xs text-slate-500 uppercase tracking-widest">API</div>
-                </div>
-                <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center">
-                  <div className="font-mono text-xl font-bold mb-2">GraphQL</div>
-                  <div className="text-xs text-slate-500 uppercase tracking-widest">Support</div>
-                </div>
-                <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center">
-                  <div className="font-mono text-xl font-bold mb-2">Webhooks</div>
-                  <div className="text-xs text-slate-500 uppercase tracking-widest">Real-time</div>
-                </div>
-                <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center">
-                  <div className="font-mono text-xl font-bold mb-2">SDKs</div>
-                  <div className="text-xs text-slate-500 uppercase tracking-widest">Ranked #1</div>
-                </div>
-              </div>
-            </div>
-            <div className="order-1 lg:order-2">
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl mb-6">
-                Integration made simple
-              </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
-                Whether you prefer REST or GraphQL, Python or Node.js, we have you covered.
-                Our libraries are typed, tested, and actively maintained.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  "Idempotency keys for safe retries",
-                  "Webhooks with signature verification",
-                  "Predictable versioning",
-                  "Comprehensive error messages"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center text-slate-700 dark:text-slate-300">
-                    <div className="mr-3 p-1 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400">
-                      <Code className="w-4 h-4" />
+                            {/* Decorative elements behind code block */}
+                            <div className="absolute -z-10 -top-4 -right-4 w-full h-full border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-900/50"></div>
+                        </motion.div>
                     </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
+                </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-slate-950 text-white relative overflow-hidden">
-        {/* Modern Background with Gradients and Grid */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-[50%] -left-[20%] w-[100%] h-[100%] rounded-full bg-brand-500/20 blur-[120px]"></div>
-          <div className="absolute top-[20%] -right-[20%] w-[80%] h-[80%] rounded-full bg-blue-600/20 blur-[120px]"></div>
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-        </div>
+            {/* Stats Section - Clean Grid */}
+            <div className="border-y border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                <div className="container mx-auto px-4">
+                    <dl className="grid grid-cols-2 gap-px bg-slate-200 dark:bg-slate-800 sm:grid-cols-4">
+                        <div className="bg-white dark:bg-slate-950 p-6 sm:p-10">
+                            <dt className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">Transaction Volume</dt>
+                            <dd className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">$10B+</dd>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 p-6 sm:p-10">
+                            <dt className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">Uptime SLA</dt>
+                            <dd className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">99.99%</dd>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 p-6 sm:p-10">
+                            <dt className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">Global Reach</dt>
+                            <dd className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">135+</dd>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 p-6 sm:p-10">
+                            <dt className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">latency</dt>
+                            <dd className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">&lt;80ms</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
 
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-3xl font-bold sm:text-4xl mb-6">Ready to launch?</h2>
-          <p className="text-slate-300 text-lg mb-10 max-w-2xl mx-auto">
-            Join the thousands of developers who are building the future of finance with Rojifi.
-            Get your API keys in less than 30 seconds.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/docs/signup" className="px-8 py-3 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded transition-colors">
-              Get API Keys
-            </Link>
-            <Link to="/docs" className="px-8 py-3 bg-transparent border border-white/20 hover:bg-white/10 text-white font-semibold rounded transition-colors">
-              Read Documentation
-            </Link>
-          </div>
-        </div>
-      </section>
+            {/* Features Grid */}
+            <section className="py-24 bg-slate-50 dark:bg-slate-950" id="features">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-2xl mx-auto lg:text-center mb-16">
+                        <h2 className="text-base font-semibold leading-7 text-brand-600 dark:text-brand-400">Build faster</h2>
+                        <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">Everything you need to scale</p>
+                        <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-400">
+                            A complete financial stack, designed from the ground up to be the best way to move money on the internet.
+                        </p>
+                    </div>
 
-    </MainLayout>
-  );
+                    {/* Bento Grid Features */}
+                    <div className="grid md:grid-cols-6 gap-6 max-w-7xl mx-auto">
+                        {/* Card 1: Global Payments (Wide) */}
+                        <motion.div
+                            initial="offscreen"
+                            whileInView="onscreen"
+                            viewport={{ once: false, amount: 0.3 }}
+                            variants={{
+                                offscreen: { y: 50, opacity: 0, scale: 0.95 },
+                                onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8 } }
+                            }}
+                            className="md:col-span-4 relative rounded-3xl bg-gradient-to-br from-slate-100 to-white dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden group"
+                        >
+                            <div className="relative z-10">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 mb-6">
+                                    <Globe className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Global Payments</h3>
+                                <p className="text-slate-600 dark:text-slate-400 max-w-sm">
+                                    Accept transactions from any corner of the world. Unified currency support across 135+ countries.
+                                </p>
+                            </div>
+
+                            {/* Global Payments - Vertical Carousel Tunnel */}
+                            <div className="absolute top-0 right-0 w-full md:w-1/2 h-full overflow-hidden mask-image-linear-to-l pointer-events-none flex items-center justify-center">
+                                {/* Gradient Overlays for Tunnel Effect */}
+                                <div className="absolute inset-0 bg-gradient-to-b from-slate-100 via-transparent to-slate-100 dark:from-slate-950 dark:via-transparent dark:to-slate-950 z-20 pointer-events-none"></div>
+
+                                {/* Carousel Container */}
+                                <div className="h-full w-full flex items-center justify-center relative scale-90 md:scale-100">
+                                    <Carousel3D />
+                                </div>
+                            </div>
+                        </motion.div>                        {/* Card 2: Developer First (Tall) */}
+                        <motion.div
+                            initial="offscreen"
+                            whileInView="onscreen"
+                            viewport={{ once: false, amount: 0.3 }}
+                            variants={{
+                                offscreen: { y: 50, opacity: 0, scale: 0.95 },
+                                onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.1 } }
+                            }}
+                            className="md:col-span-2 relative rounded-3xl bg-slate-900 text-white p-8 overflow-hidden flex flex-col justify-between"
+                        >
+                            <div className="relative z-10">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 text-white mb-6">
+                                    <Terminal className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">Developer First</h3>
+                                <p className="text-slate-400 text-sm">Top-tier typed SDKs.</p>
+                            </div>
+                            <div className="mt-6 bg-black/30 rounded-lg p-3 font-mono text-xs text-green-400 border border-white/10">
+                                <div>$ npm install rojifi</div>
+                                <div className="text-slate-500 mt-1">+ rojifi@2.0.0</div>
+                                <div className="text-slate-500">added 1 package</div>
+                            </div>
+                        </motion.div>
+
+                        {/* Card 3: Secure (Tall) */}
+                        <motion.div
+                            initial="offscreen"
+                            whileInView="onscreen"
+                            viewport={{ once: false, amount: 0.3 }}
+                            variants={{
+                                offscreen: { y: 50, opacity: 0, scale: 0.95 },
+                                onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.2 } }
+                            }}
+                            className="md:col-span-2 relative rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden group"
+                        >
+                            <div className="relative z-10">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 mb-6">
+                                    <ShieldCheck className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Secure</h3>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm">
+                                    PCI-DSS Level 1 Compliant. Default encryption.
+                                </p>
+                            </div>
+                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-colors"></div>
+                        </motion.div>
+
+                        {/* Card 4: Uptime (Wide) */}
+                        <motion.div
+                            initial="offscreen"
+                            whileInView="onscreen"
+                            viewport={{ once: false, amount: 0.3 }}
+                            variants={{
+                                offscreen: { y: 50, opacity: 0, scale: 0.95 },
+                                onscreen: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4, duration: 0.8, delay: 0.3 } }
+                            }}
+                            className="md:col-span-4 relative rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 p-8 overflow-hidden flex items-center justify-between"
+                        >
+                            <div className="relative z-10 max-w-sm">
+                                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mb-6">
+                                    <Server className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">99.99% Uptime</h3>
+                                <p className="text-slate-600 dark:text-slate-400">
+                                    Redundant architecture that scales automatically with your traffic peaks.
+                                </p>
+                            </div>
+                            <div className="hidden sm:flex gap-1 h-16 items-end">
+                                {[40, 60, 45, 70, 50, 80, 65, 90, 75, 55, 60, 50].map((h, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ height: "10%" }}
+                                        whileInView={{ height: `${h}%` }}
+                                        transition={{ duration: 1, delay: i * 0.05 }}
+                                        className="w-3 bg-brand-200 dark:bg-brand-900 rounded-t-sm"
+                                    ></motion.div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Integration Section */}
+            <section className="py-24 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
+                <div className="container mx-auto px-4">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        <div className="order-2 lg:order-1">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center">
+                                    <div className="font-mono text-xl font-bold mb-2">REST</div>
+                                    <div className="text-xs text-slate-500 uppercase tracking-widest">API</div>
+                                </div>
+                                <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center">
+                                    <div className="font-mono text-xl font-bold mb-2">GraphQL</div>
+                                    <div className="text-xs text-slate-500 uppercase tracking-widest">Support</div>
+                                </div>
+                                <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center">
+                                    <div className="font-mono text-xl font-bold mb-2">Webhooks</div>
+                                    <div className="text-xs text-slate-500 uppercase tracking-widest">Real-time</div>
+                                </div>
+                                <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center">
+                                    <div className="font-mono text-xl font-bold mb-2">SDKs</div>
+                                    <div className="text-xs text-slate-500 uppercase tracking-widest">Ranked #1</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="order-1 lg:order-2">
+                            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl mb-6">
+                                Integration made simple
+                            </h2>
+                            <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
+                                Whether you prefer REST or GraphQL, Python or Node.js, we have you covered.
+                                Our libraries are typed, tested, and actively maintained.
+                            </p>
+                            <ul className="space-y-4">
+                                {[
+                                    "Idempotency keys for safe retries",
+                                    "Webhooks with signature verification",
+                                    "Predictable versioning",
+                                    "Comprehensive error messages"
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-center text-slate-700 dark:text-slate-300">
+                                        <div className="mr-3 p-1 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400">
+                                            <Code className="w-4 h-4" />
+                                        </div>
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA Section */}
+            <section className="py-24 bg-slate-950 text-white relative overflow-hidden">
+                {/* Modern Background with Gradients and Grid */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-[50%] -left-[20%] w-[100%] h-[100%] rounded-full bg-brand-500/20 blur-[120px]"></div>
+                    <div className="absolute top-[20%] -right-[20%] w-[80%] h-[80%] rounded-full bg-blue-600/20 blur-[120px]"></div>
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+                </div>
+
+                <div className="container mx-auto px-4 relative z-10 text-center">
+                    <h2 className="text-3xl font-bold sm:text-4xl mb-6">Ready to launch?</h2>
+                    <p className="text-slate-300 text-lg mb-10 max-w-2xl mx-auto">
+                        Join the thousands of developers who are building the future of finance with Rojifi.
+                        Get your API keys in less than 30 seconds.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Link to="/docs/signup" className="px-8 py-3 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded transition-colors">
+                            Get API Keys
+                        </Link>
+                        <Link to="/docs" className="px-8 py-3 bg-transparent border border-white/20 hover:bg-white/10 text-white font-semibold rounded transition-colors">
+                            Read Documentation
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+        </MainLayout>
+    );
 }
 
 export default Homepage;
