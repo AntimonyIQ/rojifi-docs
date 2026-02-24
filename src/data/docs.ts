@@ -2112,6 +2112,62 @@ export const DOCS_DATA: DocVersion[] = [
                     description: "Calculate quote",
                   },
                 },
+                {
+                  type: "parameter",
+                  content: "Required Header",
+                  parameterData: [
+                    {
+                      name: "Authorization",
+                      type: "string",
+                      required: true,
+                      description: "Bearer <Token>",
+                    },
+                  ],
+                },
+                {
+                  type: "schema",
+                  content: "Request Body",
+                  schemaData: [
+                    {
+                      type: "string",
+                      required: true,
+                      name: "amount",
+                      description: "",
+                    },
+                    {
+                      type: "string",
+                      required: true,
+                      name: "fromCurrencyCode",
+                      description: "",
+                    },
+                    {
+                      type: "string",
+                      required: true,
+                      name: "toCurrencyCode",
+                      description: "",
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "Ok",
+                    example: {
+                      data: {
+                        Id: "",
+                        tenantId: "",
+                        InputAmount: 0.0,
+                        outputAmount: 0.0,
+                        rate: 1,
+                        spread: 0.002,
+                        fromCurrencyCode: "USD",
+                        toCurrencyCode: "NGN",
+                        expiresAt: "",
+                      },
+                    },
+                  },
+                },
               ],
             },
             {
