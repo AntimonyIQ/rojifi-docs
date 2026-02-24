@@ -386,13 +386,13 @@ export const DOCS_DATA: DocVersion[] = [
                     status: 200,
                     description: "Successful Retrieval",
                     example: {
-                      status: "success",
                       data: {
-                        id: "webhook_01H2...",
-                        url: "https://your-api.com/webhooks",
-                        secret: "whsec_...",
-                        events: ["payment.success", "transfer.failed"],
-                        is_active: true,
+                        id: "",
+                        tenantId: "",
+                        featureFlag: {},
+                        transactionLimit: 0.0,
+                        ComplianceTier: "",
+                        webhookUrl: "https://your-api.com/webhooks",
                       },
                     },
                   },
@@ -403,9 +403,39 @@ export const DOCS_DATA: DocVersion[] = [
                     status: 401,
                     description: "Unauthorized",
                     example: {
-                      status: "error",
-                      message: "Invalid API Key provided",
+                      error: "Invalid API Key provided",
                     },
+                  },
+                },
+
+                {
+                  type: "alert",
+                  variant: "info",
+                  content: "compliance tier has the following enums",
+                },
+
+                {
+                  type: "enum",
+
+                  enumData: {
+                    name: "Compliance Tier Enum",
+                    values: [
+                      {
+                        name: "COMPLIANCE_TIER_STANDARD",
+                        value: "standard",
+                        description: "",
+                      },
+                      {
+                        name: "COMPLIANCE_TIER_ENHANCED",
+                        value: "enhanced",
+                        description: "",
+                      },
+                      {
+                        name: "COMPLIANCE_TIER_RESTRICTED",
+                        value: "restricted",
+                        description: "",
+                      },
+                    ],
                   },
                 },
               ],
@@ -1156,6 +1186,45 @@ export const DOCS_DATA: DocVersion[] = [
                     description: "List associated persons",
                   },
                 },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content: "Id is the customer id",
+                },
+                {
+                  type: "parameter",
+                  variant: "info",
+                  content: "Required Headers",
+                  parameterData: [
+                    {
+                      name: "Authorization",
+                      type: "string",
+                      required: true,
+                      description: "Bearer <Token>",
+                    },
+                  ],
+                },
+
+                {
+                  type: "response",
+                  responseData: {
+                    description: "OK",
+                    status: 200,
+                    example: {
+                      data: {
+                        id: "",
+                        tenant: "",
+                        firstNmae: "",
+                        lastNmae: "",
+                        dateOfBirth: "",
+                        address: "",
+                        role: "",
+                        nationality: "",
+                        country: {},
+                      },
+                    },
+                  },
+                },
               ],
             },
             {
@@ -1170,6 +1239,41 @@ export const DOCS_DATA: DocVersion[] = [
                     method: "GET",
                     path: "/v1/customers/{id}/associated_entities",
                     description: "List associated entities",
+                  },
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content: "Id is the customer id",
+                },
+                {
+                  type: "parameter",
+                  variant: "info",
+                  content: "Required Headers",
+                  parameterData: [
+                    {
+                      name: "Authorization",
+                      type: "string",
+                      required: true,
+                      description: "Bearer <Token>",
+                    },
+                  ],
+                },
+
+                {
+                  type: "response",
+                  responseData: {
+                    description: "OK",
+                    status: 200,
+                    example: {
+                      data: {
+                        id: "",
+                        tenant: "",
+                        registrationNumber: "",
+                        associatedBusinessName: "",
+                        relationshipType: "",
+                      },
+                    },
                   },
                 },
               ],
@@ -1263,6 +1367,36 @@ export const DOCS_DATA: DocVersion[] = [
                     description: "Get exchange rates",
                   },
                 },
+                {
+                  type: "parameter",
+                  content: "Required Header",
+                  parameterData: [
+                    {
+                      type: "string",
+                      name: "Authorization",
+                      description: "Bearer <Token>",
+                      required: true,
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "ok",
+                    example: [
+                      {
+                        id: "",
+                        fromCurrencyCode: "",
+                        fromCurrency: "",
+                        toCurrencyCode: "",
+                        toCurrency: "",
+                        rate: "",
+                        effectiveAt: "",
+                      },
+                    ],
+                  },
+                },
               ],
             },
           ],
@@ -1284,6 +1418,42 @@ export const DOCS_DATA: DocVersion[] = [
                     description: "Get countries list",
                   },
                 },
+                {
+                  type: "parameter",
+                  content: "Required Header",
+                  parameterData: [
+                    {
+                      type: "string",
+                      name: "Authorization",
+                      description: "Bearer <Token>",
+                      required: true,
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "ok",
+                    example: [
+                      {
+                        id: "",
+                        name: "",
+                        iso2: "",
+                        ios3: "",
+                        numericCode: "",
+                        phoneCode: "",
+                        nationality: "",
+                        currency: "",
+                        region: "",
+                        subregion: "",
+                        riskLevel: "",
+                        isRestricted: false,
+                        IsSanctionedCountry: false,
+                      },
+                    ],
+                  },
+                },
               ],
             },
           ],
@@ -1303,6 +1473,110 @@ export const DOCS_DATA: DocVersion[] = [
                     method: "POST",
                     path: "/v1/wallets",
                     description: "Create a new wallet",
+                  },
+                },
+                {
+                  type: "parameter",
+                  content: "Required Header",
+                  parameterData: [
+                    {
+                      type: "string",
+                      name: "Authorization",
+                      description: "Bearer <Token>",
+                      required: true,
+                    },
+                  ],
+                },
+                {
+                  type: "parameter",
+                  content: "Query Paramter",
+                  parameterData: [
+                    {
+                      type: "string",
+                      name: "customer_id",
+                      description: "",
+                      required: true,
+                    },
+                    {
+                      type: "string",
+                      name: "network_id",
+                      description: "",
+                      required: true,
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 201,
+                    description: "created",
+                    example: {
+                      message: "Wallet Created",
+                    },
+                  },
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content:
+                    "The network id can be gotten from the list of networks using the endpoint below",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "GET",
+                    path: "/v1/networks",
+                    description: "List of networks",
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 201,
+                    description: "created",
+                    example: [
+                      {
+                        id: "",
+                        name: "",
+                        type: "",
+                        isActive: true,
+                        currencyCode: "",
+                        currency: {},
+                      },
+                    ],
+                  },
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content: "The network Type as the following enums",
+                },
+                {
+                  type: "enum",
+                  enumData: {
+                    name: "Network Types",
+                    values: [
+                      {
+                        name: "BLOCKCHAIN",
+                        value: "blockchain",
+                        description: "",
+                      },
+                      {
+                        name: "BANK",
+                        value: "bank",
+                        description: "",
+                      },
+                      {
+                        name: "CARD",
+                        value: "card",
+                        description: "",
+                      },
+                      {
+                        name: "OTHERS",
+                        value: "others",
+                        description: "",
+                      },
+                    ],
                   },
                 },
               ],
