@@ -1085,11 +1085,95 @@ export const DOCS_DATA: DocVersion[] = [
               status: "PRODUCTION",
               content: [
                 {
+                  type: "parameter",
+                  variant: "info",
+                  content: "Required Headers",
+                  parameterData: [
+                    {
+                      name: "Authorization",
+                      type: "string",
+                      required: true,
+                      description: "Bearer <Token>",
+                    },
+                  ],
+                },
+                {
+                  type: "text",
+                  content: "Get all businesses",
+                },
+                {
                   type: "endpoint",
                   endpointData: {
                     method: "GET",
-                    path: "/v1/customers",
-                    description: "List all customers",
+                    path: "/v1/customers/businesses",
+                    description: "List all business customers",
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "OK",
+                    status: 200,
+                    example: {
+                      data: {
+                        customer: {},
+                        directors: [{}],
+                        ubos: [{}],
+                        assoBusiness: [{}],
+                      },
+                    },
+                  },
+                },
+                {
+                  type: "text",
+                  content: "Get all Individuals",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "GET",
+                    path: "/v1/customers/individuals",
+                    description: "List all individual customers",
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "OK",
+                    status: 200,
+                    example: {
+                      data: [
+                        {
+                          tenantId: "",
+                          customerId: "",
+                          email: "",
+                          phoneCode: "",
+                          phoneNumber: "",
+                          firstName: "",
+                          lastName: "",
+                          middleName: "",
+                          dateOfBirth: "",
+                          nationality: "",
+                          addressOfResidence: "",
+                          cityOfResidence: "",
+                          stateOfResidence: "",
+                          countryOfResidence: "",
+                          postal: "",
+                          password: "",
+                          occupation: "",
+                          sourceOfFunds: "",
+                          estimatedAnnualIncomeRange: "",
+                          purposeOfAccount: "",
+                          weeklyVolume: 0,
+                          offRampService: false,
+                          fiatService: false,
+                          virtualCardService: false,
+                          otcdeskService: false,
+                          apiIntegrationService: false,
+                          metaData: "{}",
+                        },
+                      ],
+                    },
                   },
                 },
               ],
@@ -1100,12 +1184,462 @@ export const DOCS_DATA: DocVersion[] = [
               description: "Update an existing customer.",
               status: "PRODUCTION",
               content: [
+                { type: "text", content: "Business Update" }, // Acts as a header
                 {
                   type: "endpoint",
                   endpointData: {
                     method: "PUT",
-                    path: "/v1/customers/{id}",
-                    description: "Update customer details",
+                    path: "/v1/customers/{Id}/businesses",
+                    description:
+                      "Update business verification details for a customer.",
+                  },
+                },
+                {
+                  type: "parameter",
+                  variant: "info",
+                  content: "Required Headers",
+                  parameterData: [
+                    {
+                      name: "Authorization",
+                      type: "string",
+                      required: true,
+                      description: "Bearer <Token>",
+                    },
+                  ],
+                },
+                {
+                  type: "schema",
+                  content: "Request body",
+                  schemaData: [
+                    {
+                      name: "businessName",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "registrationNumber",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "incorporationDate",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "businessType",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "address",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "registeredCountry",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "ok",
+                    example: {
+                      message: "Business details updated",
+                    },
+                  },
+                },
+
+                { type: "text", content: "Update Business Directors" },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "PUT",
+                    path: "/v1/customers/{Id}/directors",
+                    description: "",
+                  },
+                },
+                {
+                  type: "schema",
+                  content: "Request body",
+                  schemaData: [
+                    {
+                      name: "firstName",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "lastName",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "dateOfBirth",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "role",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "address",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "nationality",
+                      type: "string",
+                      required: true,
+                      description:
+                        "This is a unique id gotten from the list of countries from the countries api endpoints /docs/v1/api-reference/get-countries",
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "ok",
+                    example: {
+                      message: "Director details updated",
+                    },
+                  },
+                },
+
+                { type: "text", content: "Update Ultimate Beneficiary Owner" },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "PUT",
+                    path: "/v1/customers/{Id}/ubos",
+                    description: "",
+                  },
+                },
+                {
+                  type: "schema",
+                  content: "Request body",
+                  schemaData: [
+                    {
+                      name: "firstName",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "lastName",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "dateOfBirth",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "role",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "address",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "OwnershipPercent",
+                      type: "number",
+                      required: true,
+                      description: "The value should be a decimal",
+                    },
+                    {
+                      name: "nationality",
+                      type: "string",
+                      required: true,
+                      description:
+                        "This is a unique id gotten from the list of countries from the countries api endpoints /docs/v1/api-reference/get-countries",
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "ok",
+                    example: {
+                      message: "Ultimate Beneficiary Owner Updated",
+                    },
+                  },
+                },
+
+                { type: "text", content: "Update Associated Businesses" },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "PUT",
+                    path: "/v1/customers/{Id}/associatedBusiness",
+                    description: "",
+                  },
+                },
+                {
+                  type: "schema",
+                  content: "Request body",
+                  schemaData: [
+                    {
+                      name: "associatedBusinessName",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "registrationNumber",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                    {
+                      name: "relationshipType",
+                      type: "string",
+                      required: true,
+                      description: "",
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "ok",
+                    example: {
+                      message: "Associated Business Updated",
+                    },
+                  },
+                },
+
+                { type: "text", content: "Individual Updating" },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "PUT",
+                    path: "/v1/customers/{Id}/individual/personal_information",
+                    description: "",
+                  },
+                },
+                {
+                  type: "schema",
+                  content: "Request body",
+                  schemaData: [
+                    {
+                      name: "firstName",
+                      type: "string",
+                      required: true,
+                      description:
+                        "The customer's legal first name as shown on their ID.",
+                    },
+                    {
+                      name: "lastName",
+                      type: "string",
+                      required: true,
+                      description: "The customer's legal last name.",
+                    },
+                    {
+                      name: "middleName",
+                      type: "string",
+                      required: false, // Middle names are typically optional
+                      description: "The customer's middle name, if applicable.",
+                    },
+                    {
+                      name: "nationality",
+                      type: "string",
+                      required: true,
+                      description: "The customer's country of citizenship.",
+                    },
+                    {
+                      name: "dateOfBirth",
+                      type: "string",
+                      required: true,
+                      description: "The date of birth in YYYY-MM-DD format.",
+                    },
+                    {
+                      name: "addressOfResidence",
+                      type: "string",
+                      required: true,
+                      description:
+                        "Full street address where the customer currently resides.",
+                    },
+                    {
+                      name: "cityOfResidence",
+                      type: "string",
+                      required: true,
+                      description: "The city of residence.",
+                    },
+                    {
+                      name: "stateOfResidence",
+                      type: "string",
+                      required: true,
+                      description: "The state or province of residence.",
+                    },
+                    {
+                      name: "countryOfResidence",
+                      type: "string",
+                      required: true,
+                      description:
+                        "The country where the customer is currently living.",
+                    },
+                    {
+                      name: "postal",
+                      type: "string",
+                      required: false,
+                      description:
+                        "The postal or zip code for the residence address.",
+                    },
+                    {
+                      name: "email",
+                      type: "string",
+                      required: true,
+                      description:
+                        "A valid email address for contact and verification.",
+                    },
+                    {
+                      name: "phoneCode",
+                      type: "string",
+                      required: true,
+                      description:
+                        "The international calling code (e.g., +234).",
+                    },
+                    {
+                      name: "phoneNumber",
+                      type: "string",
+                      required: true,
+                      description:
+                        "The customer's primary phone number without the country code.",
+                    },
+                  ],
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content:
+                    "The phoneCode is retrieved from the country list. Nationality and countryOfResidence must be the Country ID provided by the [Countries API](/docs/v1/api-reference/get-countries).",
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "Ok",
+                    example: {
+                      message: "Personal Information Updated",
+                    },
+                  },
+                },
+
+                {
+                  type: "text",
+                  content: "Individual Financial information Update",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "PUT",
+                    path: "/v1/customers/{Id}/individual/financial_information",
+                    description: "",
+                  },
+                },
+
+                {
+                  type: "schema",
+                  content: "Request body",
+                  schemaData: [
+                    {
+                      name: "Occupation",
+                      type: "string",
+                      required: true,
+                      description:
+                        "The customer's current profession or job title (e.g., 'Software Engineer', 'Merchant').",
+                    },
+                    {
+                      name: "SourceOfFunds",
+                      type: "string",
+                      required: true,
+                      description:
+                        "The primary origin of the customer's assets. Common values include 'Salary', 'Business Profits', or 'Investments'.",
+                    },
+                    {
+                      name: "EstimatedAnnualIncomeRange",
+                      type: "string",
+                      required: true,
+                      description:
+                        "The projected yearly income bracket (e.g., '$10,000 - $50,000').",
+                    },
+                    {
+                      name: "WeeklyVolume",
+                      type: "number",
+                      required: true,
+                      description:
+                        "The anticipated total value of transactions the customer will perform per week.",
+                    },
+                    {
+                      name: "PurposeOfAccount",
+                      type: "string",
+                      required: true,
+                      description:
+                        "The primary reason for opening the account (e.g., 'Personal Savings', 'Business Operations', 'Remittance').",
+                    },
+                  ],
+                },
+                {
+                  type: "enum",
+                  content: "Allowed Values for SourceOfFunds",
+                  enumData: {
+                    name: "Source of Funds Options",
+                    //title: "Source of Funds Options",
+                    values: [
+                      {
+                        name: "sting",
+                        value: "salary",
+                        description: "Regular employment income",
+                      },
+                      {
+                        name: "sting",
+                        value: "business_profits",
+                        description: "Earnings from a registered business",
+                      },
+                      {
+                        name: "sting",
+                        value: "inheritance",
+                        description: "Funds received from a legacy",
+                      },
+                    ],
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    status: 200,
+                    description: "ok",
+                    example: {
+                      message: "financial Information Updated",
+                    },
                   },
                 },
               ],
@@ -1162,11 +1696,106 @@ export const DOCS_DATA: DocVersion[] = [
               status: "PRODUCTION",
               content: [
                 {
+                  type: "parameter",
+                  variant: "info",
+                  content: "Required Headers",
+                  parameterData: [
+                    {
+                      name: "Authorization",
+                      type: "string",
+                      required: true,
+                      description: "Bearer <Token>",
+                    },
+                  ],
+                },
+                {
+                  type: "text",
+                  content: "Get a business",
+                },
+                {
                   type: "endpoint",
                   endpointData: {
                     method: "GET",
                     path: "/v1/customers/{id}",
-                    description: "Get customer details",
+                    description: "Get customer business details",
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "OK",
+                    status: 200,
+                    example: {
+                      data: {
+                        id: "",
+                        tenantId: "",
+                        customerId: "",
+                        businessName: "",
+                        registrationNumber: "",
+                        incorporationDate: "",
+                        address: "",
+                        status: "",
+                        businessType: "",
+                        registeredCountry: "",
+                        country: {},
+                      },
+                    },
+                  },
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content:
+                    "Note: To get associated businesses, directors and ultimate Beneficiary owner for a business check the side bar",
+                },
+                {
+                  type: "text",
+                  content: "Get an Individual details",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "GET",
+                    path: "/v1/customers/{id}/individuals",
+                    description: "Get customer individual details",
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "OK",
+                    status: 200,
+                    example: {
+                      data: {
+                        tenantId: "",
+                        customerId: "",
+                        email: "",
+                        phoneCode: "",
+                        phoneNumber: "",
+                        firstName: "",
+                        lastName: "",
+                        middleName: "",
+                        dateOfBirth: "",
+                        nationality: "",
+                        addressOfResidence: "",
+                        cityOfResidence: "",
+                        stateOfResidence: "",
+                        countryOfResidence: "",
+                        postal: "",
+                        password: "",
+                        occupation: "",
+                        sourceOfFunds: "",
+                        estimatedAnnualIncomeRange: "",
+                        purposeOfAccount: "",
+                        weeklyVolume: 0,
+                        offRampService: false,
+                        fiatService: false,
+                        virtualCardService: false,
+                        otcdeskService: false,
+                        apiIntegrationService: false,
+                        metaData: "{}",
+                      },
+                    },
                   },
                 },
               ],
@@ -1179,19 +1808,6 @@ export const DOCS_DATA: DocVersion[] = [
               status: "PRODUCTION",
               content: [
                 {
-                  type: "endpoint",
-                  endpointData: {
-                    method: "GET",
-                    path: "/v1/customers/{id}/associated_persons",
-                    description: "List associated persons",
-                  },
-                },
-                {
-                  type: "alert",
-                  variant: "info",
-                  content: "Id is the customer id",
-                },
-                {
                   type: "parameter",
                   variant: "info",
                   content: "Required Headers",
@@ -1203,6 +1819,19 @@ export const DOCS_DATA: DocVersion[] = [
                       description: "Bearer <Token>",
                     },
                   ],
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content: "Id is the customer id",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "GET",
+                    path: "/v1/customers/{id}/associated_persons",
+                    description: "List associated persons",
+                  },
                 },
 
                 {
@@ -1220,8 +1849,69 @@ export const DOCS_DATA: DocVersion[] = [
                         address: "",
                         role: "",
                         nationality: "",
-                        country: {},
+                        country: {
+                          id: "",
+                          name: "",
+                          iso2: "",
+                          iso3: "",
+                          numeric_code: "",
+                          phonecode: "",
+                          nationality: "",
+                          currency: "",
+                          region: "",
+                          subregion: "",
+                          risk_level: "",
+                          is_restricted: false,
+                          is_sanctioned_country: false,
+                        },
                       },
+                    },
+                  },
+                },
+
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "GET",
+                    path: "/v1/customers/{id}/ubos",
+                    description: "List of ultimate beneficary owners",
+                  },
+                },
+
+                {
+                  type: "response",
+                  responseData: {
+                    description: "OK",
+                    status: 200,
+                    example: {
+                      data: [
+                        {
+                          id: "",
+                          tenantId: "",
+                          firstName: "",
+                          lastName: "",
+                          kybProfileId: "",
+                          dateOfBirth: "",
+                          address: "",
+                          ownershipPercent: "",
+                          nationality: "",
+                          Country: {
+                            id: "",
+                            name: "",
+                            iso2: "",
+                            iso3: "",
+                            numeric_code: "",
+                            phonecode: "",
+                            nationality: "",
+                            currency: "",
+                            region: "",
+                            subregion: "",
+                            risk_level: "",
+                            is_restricted: false,
+                            is_sanctioned_country: false,
+                          },
+                        },
+                      ],
                     },
                   },
                 },
@@ -1285,11 +1975,352 @@ export const DOCS_DATA: DocVersion[] = [
               status: "PRODUCTION",
               content: [
                 {
+                  type: "parameter",
+                  variant: "info",
+                  content: "Required Headers",
+                  parameterData: [
+                    {
+                      name: "Authorization",
+                      type: "string",
+                      required: true,
+                      description: "Standard Bearer Token (Bearer <Token>)",
+                    },
+                  ],
+                },
+                // ===============================
+                // DOCUMENT UPLOAD SERVICE
+                // ===============================
+                {
+                  type: "text",
+                  content: "Document Upload Service",
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content:
+                    "To upload documents to the Rojifi R2 bucket, use the endpoint below. It returns a URL string upon a successful upload, which you will use in subsequent KYC/KYB submissions.",
+                },
+                {
                   type: "endpoint",
                   endpointData: {
                     method: "POST",
-                    path: "/v1/documents",
-                    description: "Upload a document",
+                    path: "/v1/upload_documents",
+                    description: "Upload a raw document file.",
+                  },
+                },
+                {
+                  type: "parameter",
+                  content: "Request Body (Multipart/Form-Data)",
+                  parameterData: [
+                    {
+                      name: "file",
+                      type: "file",
+                      description: "The document file to be uploaded.",
+                      required: true,
+                    },
+                  ],
+                },
+                {
+                  type: "alert",
+                  variant: "danger",
+                  content:
+                    "Note: The maximum file size is 20MB. Any file exceeding this limit will trigger a 413 Payload Too Large error.",
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "Document uploaded successfully.",
+                    status: 201,
+                    example: {
+                      url: "https://r2.rojifi.com/unique-file-id.pdf",
+                    },
+                  },
+                },
+                // ===============================
+                // DELETE DOCUMENT
+                // ===============================
+                {
+                  type: "text",
+                  content: "Delete Uploaded Document",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "DELETE",
+                    path: "/v1/delete_documents",
+                    description: "Remove an uploaded document from the bucket.",
+                  },
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content:
+                    "To delete a file, send the full document URL (received during upload) as a query parameter. Example: `/v1/delete_documents?url=https://...`",
+                },
+                {
+                  type: "parameter",
+                  content: "Query Parameters",
+                  parameterData: [
+                    {
+                      name: "url",
+                      type: "string",
+                      description:
+                        "The full URL of the document to be deleted.",
+                      required: true,
+                    },
+                  ],
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "File deleted successfully.",
+                    status: 200,
+                    example: {
+                      message: "file deleted",
+                    },
+                  },
+                },
+                // ===============================
+                // KYB DOCUMENT SUBMISSION
+                // ===============================
+                {
+                  type: "text",
+                  content: "KYB Document Submission",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "POST",
+                    path: "/v1/customers/{id}/documents",
+                    description:
+                      "Attach documents to a business (KYB) profile.",
+                  },
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content:
+                    "The {id} parameter in the path must be the Customer ID.",
+                },
+                {
+                  type: "parameter",
+                  content: "Request Body (JSON Array)",
+                  parameterData: [
+                    {
+                      name: "fileUrl",
+                      type: "string",
+                      description:
+                        "The URL returned from the /upload_documents endpoint.",
+                      required: true,
+                    },
+                    {
+                      name: "type",
+                      type: "string",
+                      description:
+                        "The document type (see Enum below for supported values).",
+                      required: true,
+                    },
+                    {
+                      name: "fileHash",
+                      type: "string",
+                      description:
+                        "The unique hash of the file for integrity verification.",
+                      required: true,
+                    },
+                    {
+                      name: "kybDirectorId",
+                      type: "string (UUID)",
+                      description:
+                        "Include this if the document belongs to a specific Director.",
+                      required: false,
+                    },
+                    {
+                      name: "kybUboId",
+                      type: "string (UUID)",
+                      description:
+                        "Include this if the document belongs to an Ultimate Beneficial Owner (UBO).",
+                      required: false,
+                    },
+                  ],
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content:
+                    "Important: This request body expects an ARRAY of objects. If kybDirectorId and kybUboId are omitted, the document is attributed to the business entity. You cannot include both a Director ID and a UBO ID in the same object.",
+                },
+                {
+                  type: "enum",
+                  enumData: {
+                    name: "Supported KYB Document Types",
+                    values: [
+                      {
+                        name: "ID Card",
+                        value: "id",
+                        description: "Government-issued ID",
+                      },
+                      {
+                        name: "Business Registration",
+                        value: "registration",
+                        description: "Proof of business registration",
+                      },
+                      {
+                        name: "Shareholder List",
+                        value: "shareholder",
+                        description: "Official list of shareholders",
+                      },
+                      {
+                        name: "Memorandum",
+                        value: "memorandum_and_articles_of_association",
+                        description: "Articles of Association",
+                      },
+                      {
+                        name: "Certificate of Incorporation",
+                        value: "certificate_of_incorporation",
+                        description: "Official incorporation certificate",
+                      },
+                      {
+                        name: "Incorporation Status",
+                        value: "incorporation_status_report",
+                        description: "Current status report",
+                      },
+                      {
+                        name: "Proof of Address",
+                        value: "proof_of_address",
+                        description: "Recent utility bill or bank statement",
+                      },
+                      {
+                        name: "Business Address",
+                        value: "proof_of_business_address",
+                        description: "Proof of physical business location",
+                      },
+                      {
+                        name: "CAC Certificate",
+                        value: "cac_certificate",
+                        description:
+                          "Corporate Affairs Commission certificate (NG)",
+                      },
+                      {
+                        name: "Tax Certificate",
+                        value: "tax_identification_certificate",
+                        description: "Tax ID (TIN) certificate",
+                      },
+                      {
+                        name: "Passport",
+                        value: "passport",
+                        description: "International passport",
+                      },
+                      {
+                        name: "Driver's License",
+                        value: "driver_license",
+                        description: "Valid driver's license",
+                      },
+                    ],
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "Documents submitted successfully.",
+                    status: 201,
+                    example: {
+                      message: "Documents has been submitted",
+                    },
+                  },
+                },
+                // ===============================
+                // KYC DOCUMENT SUBMISSION
+                // ===============================
+                {
+                  type: "text",
+                  content: "### KYC Document Submission",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "POST",
+                    path: "/v1/customers/{id}/individuals/documents",
+                    description:
+                      "Submit documents for an individual (KYC) profile.",
+                  },
+                },
+                {
+                  type: "parameter",
+                  content: "Request Body (JSON Array)",
+                  parameterData: [
+                    {
+                      name: "documentNumber",
+                      type: "string",
+                      description:
+                        "The unique ID number on the document (e.g., Passport number).",
+                      required: false,
+                    },
+                    {
+                      name: "documentUrl",
+                      type: "string",
+                      description: "The URL of the uploaded file.",
+                      required: true,
+                    },
+                    {
+                      name: "countryDocumentId",
+                      type: "string (UUID)",
+                      description:
+                        "The ID of the document type requirement for the user's country.",
+                      required: true,
+                    },
+                  ],
+                },
+                {
+                  type: "alert",
+                  variant: "info",
+                  content:
+                    "The countryDocumentId refers to the specific document requirements based on the user's country of residence. You can retrieve these requirements using the endpoint below.",
+                },
+                {
+                  type: "endpoint",
+                  endpointData: {
+                    method: "GET",
+                    path: "/v1/country_documents",
+                    description: "List document requirements by country.",
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "Available country document requirements.",
+                    status: 200,
+                    example: {
+                      data: [
+                        {
+                          id: "2c5e8fa3-89ba-44f9-a60d-cada9df67891",
+                          countryId: "ec8128b2-19bb-41a4-8081-a43f1f5fbe1a",
+                          documentTypeId:
+                            "71e975ee-7ae5-4249-aab8-f2f16f772d54",
+                          is_required: true,
+                          country: {
+                            name: "Nigeria",
+                            iso2: "NG",
+                            phonecode: "+234",
+                            currency: "NGN",
+                          },
+                          documentType: {
+                            code: "NIN",
+                            name: "National Identification Number",
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
+                  type: "response",
+                  responseData: {
+                    description: "KYC documents saved successfully.",
+                    status: 201,
+                    example: {
+                      message:
+                        "Individual Documents submitted information saved",
+                    },
                   },
                 },
               ],
